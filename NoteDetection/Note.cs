@@ -47,9 +47,9 @@ namespace NoteDetection
     public class Note
     {
         /// <summary>
-        /// The note Y position, the measure will set the X position, when it draws it
+        /// Set the Note Position to be Drawn
         /// </summary>
-        public int NotePosition { get; set; }
+        public Point NotePosition { get; set; }
 
         /// <summary>
         /// The time when the note is pressed
@@ -61,10 +61,21 @@ namespace NoteDetection
         /// </summary>
         public Timing NoteTime { get; set; }
 
-        public Note(int position, DateTime start, Timing time)
+        /// <summary>
+        /// The noteID of the Note
+        /// </summary>
+        public int NoteID { get; set; }
+
+        public Note(int ID, DateTime start, Timing time)
+        {
+            NoteID = ID;
+            NoteStart = start;
+            NoteTime = time;
+        }
+
+        public Note(Point position, Timing time)
         {
             NotePosition = position;
-            NoteStart = start;
             NoteTime = time;
         }
 

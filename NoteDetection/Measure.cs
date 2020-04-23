@@ -8,9 +8,7 @@ using System.Threading.Tasks;
 
 namespace NoteDetection
 {
-    /// <summary>
-    /// How to think about getting and setting Note Position?
-    /// </summary>
+
     public class Measure
     {
         /// <summary>
@@ -24,9 +22,9 @@ namespace NoteDetection
         public long Count { get; set; } = 4000;
 
         /// <summary>
-        /// List of Notes per Measure to draw
+        /// List of Each Measure with List of Notes to Draw
         /// </summary>
-        public List<Note> FullMeasure { get; set; }
+        public List<List<Note>> FullMeasure { get; set; }
 
         /// <summary>
         /// Queue of Played Notes
@@ -36,19 +34,23 @@ namespace NoteDetection
         private Note current;
         private long measureCount;
 
-        public bool CompleteMeasure()
+        public bool CompleteMeasure(Queue<Note> played)
         {
+            List<Note> measure = new List<Note>();
             measureCount = 0;
 
             while(measureCount <= Count)
             {
-                if ((measureCount += PeakTime()) == Count)
+                if ((measureCount += PeakTime(played)) == Count)
                 {
+                    measure.Add(current);
+                    measureCount += DequeueTime(played);
                     break;
                 }
-                else if((measureCount += PeakTime()) < Count)
+                else if((measureCount += PeakTime(played)) < Count)
                 {
-                    measureCount += DequeueTime();
+                    measure.Add(current);
+                    measureCount += DequeueTime(played);
                 }
                 else // it is greater and needs to be in the next measure
                 {
@@ -56,8 +58,31 @@ namespace NoteDetection
                 }
             }
 
+            FullMeasure.Add(measure);
             return true;
             // If true need to draw vertical line at and begin new measure
+        }
+
+        /// <summary>
+        /// How to think about getting and setting Note Position???
+        /// </summary>
+        public Queue<Note> SetPositions(Keys keys)
+        {
+            Queue<Note> queue = new Queue<Note>();
+            
+            while(PlayedNotes.Count != 0)
+            {
+                Note note = PlayedNotes.Dequeue();
+                double offsetX = note.GetSpacing(note.NoteTime);
+                double y = keys.GetPosition(note.NoteID);
+
+                // Check Note Time for how to offset X;
+                // Create new Note(position, Timing) add Note to queue
+                // which will in turn be used in Complete Measure
+               
+            }
+
+            return queue;
         }
 
         private long EstimateCount(Timing time)
@@ -97,15 +122,15 @@ namespace NoteDetection
             return count;
         }
 
-        private long PeakTime()
+        private long PeakTime(Queue<Note> played)
         {
-            current = PlayedNotes.Peek();
+            current = played.Peek();
             return EstimateCount(current.NoteTime);
         }
 
-        private long DequeueTime()
+        private long DequeueTime(Queue<Note> played)
         {
-            current = PlayedNotes.Dequeue();
+            current = played.Dequeue();
             return EstimateCount(current.NoteTime);
         }
 
