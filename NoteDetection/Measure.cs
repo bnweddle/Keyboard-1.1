@@ -9,8 +9,7 @@ using System.Threading.Tasks;
 namespace NoteDetection
 {
     /// <summary>
-    /// Need to think about how spacing of notes should depend on which type of note is pressed
-    /// So all measures would be the same size.
+    /// How to think about getting and setting Note Position?
     /// </summary>
     public class Measure
     {
@@ -25,14 +24,9 @@ namespace NoteDetection
         public long Count { get; set; } = 4000;
 
         /// <summary>
-        /// List of Notes per Measure to draw for left hand
+        /// List of Notes per Measure to draw
         /// </summary>
-        public List<Note> LeftFullMeasure { get; set; }
-
-        /// <summary>
-        /// List of Notes per Measure to draw for right hand
-        /// </summary>
-        public List<Note> RightFullMeasure { get; set; }
+        public List<Note> FullMeasure { get; set; }
 
         /// <summary>
         /// Queue of Played Notes
@@ -97,9 +91,6 @@ namespace NoteDetection
                     break;
                 case Timing.Whole:
                     count = 4000;
-                    break;
-                case Timing.ThirdWhole:
-                    count = 6000;
                     break;
             }
 
