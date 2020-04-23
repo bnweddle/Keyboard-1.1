@@ -116,8 +116,8 @@ namespace NoteDetection
                 if (third) handOffsetX = 15; else handOffsetX = 18;
                 handOffsetY = 70;
 
-                // Whole notes must be sized differently
-                if (Global.Time == Timing.Whole || Global.Time == Timing.ThirdWhole)
+                // Whole note must be sized differently
+                if (Global.Time == Timing.Whole)
                 {
                     symbol = new Symbol(Global.Image, off + 20, (float)position, 24, 15);
                     DrawingLeftNotes.Add(symbol);
@@ -132,8 +132,7 @@ namespace NoteDetection
 
 
             if (third)
-            {   // For checking if it is a third note to add the dot, if whole note it will need to be swifted slightly
-                if (Global.Time == Timing.ThirdWhole) handOffsetX -= 5;
+            {   
                 Symbol s = new Symbol("\uD834\uDD58", 25, symbol.X + 30 - handOffsetX, symbol.Y + 48 - handOffsetY);
                 DrawingRightNotes.Add(s);
                 handOffsetX += 5; // reset back to normal, so it doesn't effect other offsets

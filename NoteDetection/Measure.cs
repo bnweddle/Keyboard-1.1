@@ -8,12 +8,16 @@ using System.Threading.Tasks;
 
 namespace NoteDetection
 {
+    /// <summary>
+    /// Need to think about how spacing of notes should depend on which type of note is pressed
+    /// So all measures would be the same size.
+    /// </summary>
     public class Measure
     {
         /// <summary>
-        /// The Width of each Measure
+        /// The Width of each Measure, 16 sixteenth notes = whole note!! That's crazy width
         /// </summary>
-        public int Width { get; set; } = 500;
+        public int Width { get; set; } = 925;
 
         /// <summary>
         /// How many Milliseconds (counts) are on a full measure
@@ -52,13 +56,15 @@ namespace NoteDetection
                 {
                     measureCount += DequeueTime();
                 }
+                else // it is greater and needs to be in the next measure
+                {
+                    break;
+                }
             }
 
             return true;
-            // If true need to draw vertical line at 
+            // If true need to draw vertical line at and begin new measure
         }
-
-
 
         private long EstimateCount(Timing time)
         {

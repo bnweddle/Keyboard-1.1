@@ -28,9 +28,7 @@ namespace NoteDetection
         ThirdQuart,      // Need a dot beside it
         Half,            // "\uD834\uDD5E"
         ThirdHalf,       // Need a dot beside it
-        Whole,            // "\uD834\uDD5D"
-        ThirdWhole
-
+        Whole           // "\uD834\uDD5D"
     };
 
     /// <summary>
@@ -72,6 +70,43 @@ namespace NoteDetection
 
         public Note() {}
 
+        public double GetSpacing(Timing symbol)
+        {
+            double offset = 0;
+            switch (symbol)
+            {
+                case Timing.Sixteenth:
+                    offset = 45;
+                    break;
+                case Timing.ThirdSixteen:
+                    offset = 45 + 22.5;
+                    break;
+                case Timing.Eighth:
+                    offset = 90;
+                    break;
+                case Timing.ThirdEigth:
+                    offset = 120;
+                    break;
+                case Timing.Quarter:
+                    offset = 180;
+                    break;
+                case Timing.ThirdQuart:
+                    offset = 270;
+                    break;
+                case Timing.Half:
+                    offset = 360;
+                    break;
+                case Timing.ThirdHalf:
+                    offset = 540;
+                    break;
+                case Timing.Whole:
+                    offset = 720;
+                    break;
+            }
+
+            return offset;
+        }
+
         /// <summary>
         /// Gets the Note Unicode Symbol
         /// </summary>
@@ -107,9 +142,6 @@ namespace NoteDetection
                     unicode = "\uD834\uDD5E"; // Need a dot beside it
                     break;
                 case Timing.Whole:
-                    unicode = "\uD834\uDD5D";
-                    break;
-                case Timing.ThirdWhole:
                     unicode = "\uD834\uDD5D";
                     break;
             }
@@ -187,10 +219,6 @@ namespace NoteDetection
                 case Timing.Whole:
                     time = Timing.Whole;
                     image = Properties.Resources.whole; // looks a little different from right whole note
-                    break;
-                case Timing.ThirdWhole:
-                    time = Timing.ThirdWhole;
-                    image = Properties.Resources.whole; 
                     break;
             }
             return image;

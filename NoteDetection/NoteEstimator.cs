@@ -21,7 +21,7 @@ namespace NoteDetection
         /// <param name="bpm">Beats per Minute from Start Form</param>
         public NoteEstimator(int bpm)
         {
-            thresholds = new long[10];
+            thresholds = new long[9];
             int minute = 60000;
 
             thresholds[(int)Timing.Sixteenth] = (minute / bpm) / 3;
@@ -33,7 +33,6 @@ namespace NoteDetection
             thresholds[(int)Timing.Half] = (minute / bpm) * 3;
             thresholds[(int)Timing.ThirdHalf] = (long)((minute / bpm) * 3.5);
             thresholds[(int)Timing.Whole] = (long)((minute / bpm) * 4.5);
-            thresholds[(int)Timing.ThirdWhole] = (long)((minute / bpm) * 5);
 
         }
 
@@ -77,11 +76,8 @@ namespace NoteDetection
             {
                 return Timing.ThirdHalf;
             }
-            if (duration < thresholds[8])
-            {
+            else
                 return Timing.Whole;
-            }
-            return Timing.ThirdWhole;
         }
 
     }
