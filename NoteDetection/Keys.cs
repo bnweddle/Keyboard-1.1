@@ -1,6 +1,5 @@
 ﻿/* Author: Bethany Weddle
  * Class: Keys.cs
- *
  * */
 
 namespace NoteDetection

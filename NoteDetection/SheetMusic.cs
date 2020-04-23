@@ -8,6 +8,8 @@
  * 4. Fix Scrolling Off the Form Issue                - Show Professor
  *    (Slightly better)
  * 5. Two Notes right beside each other are pressed  
+ * 6. If multiple eight or sixteenth notes are pressed only draw one curly end
+ * 7. Have offset problem 
  *    
  * Extra to Think About for future:
  * 1. How to implement Beams when multiple Eighth/Sixteenth Notes are pressed
@@ -117,13 +119,13 @@ namespace NoteDetection
                 // Whole notes must be sized differently
                 if (Global.Time == Timing.Whole || Global.Time == Timing.ThirdWhole)
                 {
-                    symbol = new Symbol(Global.Image, off, (float)position, 24, 15);
+                    symbol = new Symbol(Global.Image, off + 20, (float)position, 24, 15);
                     DrawingLeftNotes.Add(symbol);
                 }
                 else
                 {
                     // All other left hand notes
-                    symbol = new Symbol(Global.Image, off, (float)position, 20, 60);
+                    symbol = new Symbol(Global.Image, off + 20, (float)position, 20, 60);
                     DrawingLeftNotes.Add(symbol);
                 }
             }

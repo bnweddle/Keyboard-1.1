@@ -1,6 +1,7 @@
 ﻿/* Author: Bethany Weddle
  * Class: Note.cs
  * */
+using System;
 using System.Drawing;
 
 namespace NoteDetection
@@ -47,6 +48,30 @@ namespace NoteDetection
     /// </summary>
     public class Note
     {
+        /// <summary>
+        /// The note Y position, the measure will set the X position, when it draws it
+        /// </summary>
+        public int NotePosition { get; set; }
+
+        /// <summary>
+        /// The time when the note is pressed
+        /// </summary>
+        public DateTime NoteStart { get; set; }
+
+        /// <summary>
+        /// The Type of Note played
+        /// </summary>
+        public Timing NoteTime { get; set; }
+
+        public Note(int position, DateTime start, Timing time)
+        {
+            NotePosition = position;
+            NoteStart = start;
+            NoteTime = time;
+        }
+
+        public Note() {}
+
         /// <summary>
         /// Gets the Note Unicode Symbol
         /// </summary>

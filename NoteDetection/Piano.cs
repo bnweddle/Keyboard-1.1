@@ -1,15 +1,6 @@
 ﻿/* Author: Bethany Weddle
  * Class: Piano.cs
  * Used PianoControl from MidiKit on Github with Free Software License
- * 
- * TO DO: 
- * 1. Change how Keyboard Keys work
- * 2. Think about Rests (time between pressed notes)  - Get Idea from Professor
- * 3. Implement Measures checking with Time Signature - Get Idea from Professor
- * 4. Fix Offset when more than 1 note is pressed     - Ask Professor
- * 5. Fix Sharp/Flat position to be constant 
- * 6. Fix LIMIATION in Keys.cs                        - Show Professor
- * 
  * */
 using System;
 using System.Diagnostics;
@@ -31,8 +22,8 @@ namespace NoteDetection
         // Old and New timers for Note duration
         Stopwatch[] oldTimers = new Stopwatch[127]; 
         Stopwatch[] currentTimers = new Stopwatch[127];
-        
-        int BeatsPerMinute;
+
+        DateTime startTime; 
 
         // Note objects
         NoteEstimator noteEstimator;
@@ -59,7 +50,6 @@ namespace NoteDetection
         public Piano(int bpm, Chromatic type, SheetMusic form)
         {
             InitializeComponent();
-            BeatsPerMinute = bpm;
             sheetForm = form;
             chromatic = type; 
             noteEstimator = new NoteEstimator(bpm);
@@ -96,13 +86,18 @@ namespace NoteDetection
 
             base.OnLoad(e);
         }
-        
+
+        int noteID;
         // For when the Keyboard Note or Mouse  Note is pressed
         private void PianoControl_PianoKeyDown(object sender, PianoKeyEventArgs e)
         {
             oldTimers[e.NoteID].Start();
+            noteID = e.NoteID;
+            startTime = DateTime.UtcNow;
+            System.Diagnostics.Debug.WriteLine($"{startTime} time button pushed");
             System.Diagnostics.Debug.WriteLine($"{e.NoteID} noteID");
             outDevice.Send(new ChannelMessage(ChannelCommand.NoteOn, 0, e.NoteID, 127));
+
             offset += 45;
         }
 
