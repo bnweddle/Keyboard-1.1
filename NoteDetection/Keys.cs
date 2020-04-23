@@ -142,5 +142,43 @@ namespace NoteDetection
         {
             return positions[noteID - 21];
         }
+
+        public Chromatic ChangePosition(int noteID, Note beforeNote, Note currentNote)
+        {
+            bool blackPressed = false;
+            int blackKey = BlackKeyPress(noteID, out blackPressed);
+
+            Chromatic chromatic = Chromatic.Natural;
+
+            /* if newNote + 1 == oldNote and newNote == blackNote 
+            *  if newNote - 1 == oldNote and newNote == blackNote
+            * 
+            * if newNote + 1 == OldNote and newNote != blackNote
+            * if newNote + 2 == OldNote || if newNote - 2 == oldNote
+            * */
+            /*if (newNote + 1 == oldNote && newNote == blackKeys[index] - 1)
+            {
+                // Drawing two flats??
+                chromatic = Chromatic.Flat;
+                System.Diagnostics.Debug.WriteLine($"{chromatic } chromatic");
+            }
+            else if (newNote - 1 == oldNote && newNote == blackKeys[index] - 1)
+            {
+                // Might work better after fixing Keys LIMITATION
+                chromatic = Chromatic.Sharp;
+                System.Diagnostics.Debug.WriteLine($"{chromatic } chromatic");
+            }
+            else if (newNote + 2 == oldNote || newNote - 2 == oldNote)
+            {
+                // Need to account for D E and A B
+                // chromatic should go back to what is was before after measure complete
+            }
+            else
+            {
+                chromatic = Chromatic.Natural;
+            } */
+
+            return chromatic;
+        }
     }
 }

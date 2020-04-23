@@ -27,7 +27,7 @@ namespace NoteDetection
 
         // Note objects
         NoteEstimator noteEstimator;
-        Note note = new Note();
+        Drawn drawn = new Drawn();
         Keys keys = new Keys();
         SheetMusic sheetForm;
 
@@ -131,10 +131,10 @@ namespace NoteDetection
             sheetForm.SetChromatic(chrom, chromatic);
 
             // Globally shared variables
-            Global.Symbol = note.GetNoteSymbol(symbols);
-            Global.Chromatic = note.GetChromaticSymbol(chromatic);
+            Global.Symbol = drawn.GetNoteSymbol(symbols);
+            Global.Chromatic = drawn.GetChromaticSymbol(chromatic);
             Timing time;
-            Global.Image = note.GetImage(symbols, out time);
+            Global.Image = drawn.GetImage(symbols, out time);
             Global.Time = time;
 
             sheetForm.UpdatePaint(offset, thirds, keys.GetPosition(e.NoteID));

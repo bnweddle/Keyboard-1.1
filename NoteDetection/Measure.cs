@@ -69,16 +69,32 @@ namespace NoteDetection
         public Queue<Note> SetPositions(Keys keys)
         {
             Queue<Note> queue = new Queue<Note>();
-            
-            while(PlayedNotes.Count != 0)
-            {
-                Note note = PlayedNotes.Dequeue();
-                double offsetX = note.GetSpacing(note.NoteTime);
-                double y = keys.GetPosition(note.NoteID);
 
+            // PlayedNotes will be of type (ID, startTime, timing) Note
+
+            while (PlayedNotes.Count != 0)
+            {
+                Note before = PlayedNotes.Dequeue();
+                Note current = PlayedNotes.Peek();
+                
+                if(before.NoteStart.Millisecond == current.NoteStart.Millisecond)
+                {
+                    // They should have same X start position
+                }
+                else
+                {
+                    // They should be spaced apart
+                }
+                
+                // double offsetX = note.GetSpacing(note.NoteTime);
+                // double y = keys.GetPosition(note.NoteID);
+
+                // Current Strategy: 
                 // Check Note Time for how to offset X;
                 // Create new Note(position, Timing) add Note to queue
                 // which will in turn be used in Complete Measure
+
+                // How to use DateTime to position notes approximately?
                
             }
 

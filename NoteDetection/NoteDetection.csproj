@@ -89,6 +89,7 @@
     <Compile Include="Global.cs" />
     <Compile Include="Keys.cs" />
     <Compile Include="Measure.cs" />
+    <Compile Include="Drawn.cs" />
     <Compile Include="Note.cs" />
     <Compile Include="NoteEstimator.cs" />
     <Compile Include="Piano.cs">
