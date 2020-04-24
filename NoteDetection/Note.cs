@@ -33,16 +33,23 @@ namespace NoteDetection
         public int NoteID { get; set; }
 
         /// <summary>
+        /// The Key the sheet music is written in: Sharp or Flat
+        /// </summary>
+        public Chromatic MusicKey { get; set; }
+
+        /// <summary>
         /// Create in the Piano to the passed to Measure?
         /// </summary>
         /// <param name="ID">the noteID</param>
         /// <param name="start">the time when the Note was pressed</param>
         /// <param name="time">the Timing of the Note</param>
-        public Note(int ID, DateTime start, Timing time)
+        /// <param name="music">The key the music is in</param>
+        public Note(int ID, DateTime start, Timing time, Chromatic music)
         {
             NoteID = ID;
             NoteStart = start;
             NoteTime = time;
+            MusicKey = music;
         }
 
         /// <summary>

@@ -116,7 +116,7 @@ namespace NoteDetection
                     }
                     else if (type == Chromatic.Flat)
                     {
-                        index = (blackPressed - 1) * 7.5;
+                        index = (blackPressed + 1) * 7.5;
                     }
                 }
 
@@ -143,42 +143,42 @@ namespace NoteDetection
             return positions[noteID - 21];
         }
 
-        public Chromatic ChangePosition(int noteID, Note beforeNote, Note currentNote)
+        public int ChangePosition(double oldY, double currentY, int number, bool chrom, Chromatic oldvalue, out Chromatic chromatic)
         {
-            bool blackPressed = false;
-            int blackKey = BlackKeyPress(noteID, out blackPressed);
+            // Not sure to check if measure is completed/how to revert back to old chromatic
+            // Return offset or return Chromatic? 
 
-            Chromatic chromatic = Chromatic.Natural;
+            // It's behind one
+            chromatic = oldvalue;
+            int shiftX = 0;
+            if (number >= 2)
+            {
+                if (oldY == currentY && oldvalue == Chromatic.Flat && chrom == true)
+                {
+                    chromatic = Chromatic.Sharp;
+                    shiftX -= 20;
+                }
+                else if (oldY == currentY && oldvalue == Chromatic.Sharp && chrom == true)
+                {
+                    chromatic = Chromatic.Flat;
+                    shiftX = -20;
+                }
+                else if ((oldY + 7.5 == currentY || currentY + 7.5 == oldY) && oldvalue == Chromatic.Sharp)
+                {
+                    shiftX = -20;
+                }
+                else if ((oldY + 7.5 == currentY || currentY + 7.5 == oldY) && oldvalue == Chromatic.Flat)
+                {
+                    shiftX = -20;
+                }
+                else if ((oldY + 7.5 == currentY || currentY + 7.5 == oldY) && chrom == false)
+                {
+                    shiftX = 20;
+                    chromatic = oldvalue;
+                }
+            }
 
-            /* if newNote + 1 == oldNote and newNote == blackNote 
-            *  if newNote - 1 == oldNote and newNote == blackNote
-            * 
-            * if newNote + 1 == OldNote and newNote != blackNote
-            * if newNote + 2 == OldNote || if newNote - 2 == oldNote
-            * */
-            /*if (newNote + 1 == oldNote && newNote == blackKeys[index] - 1)
-            {
-                // Drawing two flats??
-                chromatic = Chromatic.Flat;
-                System.Diagnostics.Debug.WriteLine($"{chromatic } chromatic");
-            }
-            else if (newNote - 1 == oldNote && newNote == blackKeys[index] - 1)
-            {
-                // Might work better after fixing Keys LIMITATION
-                chromatic = Chromatic.Sharp;
-                System.Diagnostics.Debug.WriteLine($"{chromatic } chromatic");
-            }
-            else if (newNote + 2 == oldNote || newNote - 2 == oldNote)
-            {
-                // Need to account for D E and A B
-                // chromatic should go back to what is was before after measure complete
-            }
-            else
-            {
-                chromatic = Chromatic.Natural;
-            } */
-
-            return chromatic;
+            return shiftX;
         }
     }
 }

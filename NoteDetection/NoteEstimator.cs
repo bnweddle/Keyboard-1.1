@@ -15,6 +15,13 @@ namespace NoteDetection
         /// </summary>
         private static long[] thresholds;
 
+        public long SixteenthCount {
+            get
+            {
+                return thresholds[0];
+            }
+        }
+
         /// <summary>
         ///  Stores the thresholds based on the BPM retrieved from Start Form
         /// </summary>

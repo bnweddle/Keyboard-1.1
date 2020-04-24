@@ -23,7 +23,8 @@ namespace NoteDetection
         Stopwatch[] oldTimers = new Stopwatch[127]; 
         Stopwatch[] currentTimers = new Stopwatch[127];
 
-        DateTime startTime; 
+        DateTime startTime;
+        System.Timers.Timer metronome;
 
         // Note objects
         NoteEstimator noteEstimator;
@@ -53,6 +54,7 @@ namespace NoteDetection
             sheetForm = form;
             chromatic = type; 
             noteEstimator = new NoteEstimator(bpm);
+            
             sheetForm.Show();
 
             // Initializes the Stopwatch Timers
@@ -62,8 +64,16 @@ namespace NoteDetection
                 currentTimers[i] = new Stopwatch();
             }
             this.pianoControl.Size = this.Size;
+
+            metronome = new System.Timers.Timer(noteEstimator.SixteenthCount);
+            metronome.Elapsed += OnTick;
         }
 
+        private void OnTick(object args, System.Timers.ElapsedEventArgs e)
+        {
+            
+        }
+            
         // Loads the Device for the Piano Control
         protected override void OnLoad(EventArgs e)
         {
@@ -87,15 +97,19 @@ namespace NoteDetection
             base.OnLoad(e);
         }
 
-        int noteID;
+        double oldY = 0;
+        double newY = 0;
+        int numberPlayed = 0;
+
         // For when the Keyboard Note or Mouse  Note is pressed
         private void PianoControl_PianoKeyDown(object sender, PianoKeyEventArgs e)
         {
             oldTimers[e.NoteID].Start();
-            noteID = e.NoteID;
+            
             startTime = DateTime.UtcNow;
-            System.Diagnostics.Debug.WriteLine($"{startTime} time button pushed");
-            System.Diagnostics.Debug.WriteLine($"{e.NoteID} noteID");
+            metronome.Start(); // HERE??
+
+            //System.Diagnostics.Debug.WriteLine($"{e.NoteID} noteID");
             outDevice.Send(new ChannelMessage(ChannelCommand.NoteOn, 0, e.NoteID, 127));
 
             offset += 45;
@@ -103,7 +117,20 @@ namespace NoteDetection
 
         // For when the Keyboard Note or Mouse Note is released
         private void PianoControl_PianoKeyUp(object sender, PianoKeyEventArgs e)
-        {   
+        {
+            // Setting the Positions
+
+            whitePressed = keys.WhiteKeyPress(e.NoteID, out chrom);
+            blackPressed = keys.BlackKeyPress(e.NoteID, out chrom);
+
+            Chromatic oldValue = chromatic;
+            int shiftX = keys.ChangePosition(oldY, newY, numberPlayed, chrom, oldValue, out chromatic);
+
+            keys.SetPositions(blackPressed, whitePressed, chromatic, chrom);
+            
+            sheetForm.SetChromatic(chrom, chromatic);
+            oldY = keys.GetPosition(e.NoteID);
+
             oldTimers[e.NoteID].Stop();       
             outDevice.Send(new ChannelMessage(ChannelCommand.NoteOff, 0, e.NoteID, 0));
 
@@ -120,15 +147,14 @@ namespace NoteDetection
 
             System.Diagnostics.Debug.WriteLine($"{symbols } timing");
 
-            // Setting the Positions
-            whitePressed = keys.WhiteKeyPress(e.NoteID, out chrom);
-            blackPressed = keys.BlackKeyPress(e.NoteID, out chrom);
-            keys.SetPositions(blackPressed, whitePressed, chromatic, chrom);
 
-            System.Diagnostics.Debug.WriteLine($"{whitePressed } white note");
-            System.Diagnostics.Debug.WriteLine($"{blackPressed } black note");
 
-            sheetForm.SetChromatic(chrom, chromatic);
+            System.Diagnostics.Debug.WriteLine($"{oldY } old Y Position");
+            System.Diagnostics.Debug.WriteLine($"{newY } new Y Position");     
+
+            
+
+            newY = oldY;
 
             // Globally shared variables
             Global.Symbol = drawn.GetNoteSymbol(symbols);
@@ -137,7 +163,7 @@ namespace NoteDetection
             Global.Image = drawn.GetImage(symbols, out time);
             Global.Time = time;
 
-            sheetForm.UpdatePaint(offset, thirds, keys.GetPosition(e.NoteID));
+            sheetForm.UpdatePaint(offset + shiftX, thirds, oldY);
 
             oldTimers[e.NoteID].Reset();
         }
@@ -146,6 +172,7 @@ namespace NoteDetection
         private void pianoControl_KeyDown(object sender, KeyEventArgs e)
         {
             pianoControl.PressPianoKey(e.KeyCode);
+            numberPlayed++;
             base.OnKeyDown(e);
         }
 
@@ -154,6 +181,7 @@ namespace NoteDetection
         {
             pianoControl.ReleasePianoKey(e.KeyCode);
             base.OnKeyUp(e);
+            numberPlayed = 0;
         }
 
         // For Closing the Forms

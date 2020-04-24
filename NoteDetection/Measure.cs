@@ -36,14 +36,21 @@ namespace NoteDetection
 
         public bool CompleteMeasure(Queue<Note> played)
         {
+            //sort by StartingTime
+
             List<Note> measure = new List<Note>();
             measureCount = 0;
 
-            while(measureCount <= Count)
+            // What about two notes pressed at the same time?
+            // This will make the Measure count Two played notes as two Times
+            // instead of one
+            while (measureCount <= Count)
             {
+                // Maybe something checking the Count of played notes
+                // Should Queue have list of Notes or One/Two/Three as they are played?
                 if ((measureCount += PeakTime(played)) == Count)
                 {
-                    measure.Add(current);
+                    measure.Add(played.Dequeue());
                     measureCount += DequeueTime(played);
                     break;
                 }
@@ -70,31 +77,40 @@ namespace NoteDetection
         {
             Queue<Note> queue = new Queue<Note>();
 
-            // PlayedNotes will be of type (ID, startTime, timing) Note
+            // PlayedNotes will be of type (ID, startTime, timing, musicKey) Note
 
             while (PlayedNotes.Count != 0)
             {
                 Note before = PlayedNotes.Dequeue();
                 Note current = PlayedNotes.Peek();
-                
-                if(before.NoteStart.Millisecond == current.NoteStart.Millisecond)
+
+                if (current != null)
                 {
-                    // They should have same X start position
+
+                    if (Math.Abs(before.NoteStart.Millisecond - current.NoteStart.Millisecond) <= 20)
+                    {
+                        // They should have same X start position
+                    }
+                    else
+                    {
+                        // They should be spaced apart
+                    }
+
+                    // double offsetX = note.GetSpacing(note.NoteTime);
+                    // double y = keys.GetPosition(note.NoteID);
+
+                    // Current Strategy: 
+                    // Check Note Time for how to offset X;
+                    // Create new Note(position, Timing) add Note to queue
+                    // which will in turn be used in Complete Measure
+
+                    // How to use DateTime to position notes approximately?
                 }
                 else
                 {
-                    // They should be spaced apart
+                    // otherwise only one note was pressed and needs to be added to queue
+                    // with position and spacing
                 }
-                
-                // double offsetX = note.GetSpacing(note.NoteTime);
-                // double y = keys.GetPosition(note.NoteID);
-
-                // Current Strategy: 
-                // Check Note Time for how to offset X;
-                // Create new Note(position, Timing) add Note to queue
-                // which will in turn be used in Complete Measure
-
-                // How to use DateTime to position notes approximately?
                
             }
 
