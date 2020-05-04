@@ -78,35 +78,42 @@ namespace NoteDetection
             metronome.Elapsed += OnTick;
         }
 
-        // Sixteeneth Rest -> "\uD834\uDD3F"
-        // Eighteth Rest ->  "\uD834\uDD3E"
-        // Quarter Rest -> "\uD834\uDD3D"
         private void OnTick(object args, System.Timers.ElapsedEventArgs e)
         {
             if(leftHand == 0)
             {
                 leftRest.Start();
+                if (leftRest.ElapsedMilliseconds.Round(100) >= noteEstimator.QuarterCount)
+                {
+                    leftHand = 1;
+                }
             }
             if (leftHand != 0)
             {
                 leftRest.Stop();
-                // draw the symbol for the rest add to restList to be drawn in SheetMusic
+                string rest = noteEstimator.GetRestSymbol(rightRest.ElapsedMilliseconds.Round(100));
+                sheetForm.Rests.Add(new Symbol(rest, 60, offset, 300));
                 leftRest.Reset();
             }
             if (rightHand == 0)
             {
                 rightRest.Start();
+                if(rightRest.ElapsedMilliseconds.Round(100) >= noteEstimator.QuarterCount)
+                {
+                    rightHand = 1;
+                }
             }
             if(rightHand != 0)
             {
                 rightRest.Stop();
-                // draw the symbol for the rest add to restList to be drawn in SheetMusic
+                string rest = noteEstimator.GetRestSymbol(rightRest.ElapsedMilliseconds.Round(100));
+                sheetForm.Rests.Add(new Symbol(rest, 60, offset, 150));
                 rightRest.Reset();
             }
             if(measureTime.ElapsedMilliseconds >= (noteEstimator.SixteenthCount * 16))
             {
                 measureTime.Reset();
-                sheetForm.measurePositions.Add(measure.Width);
+                sheetForm.MeasurePositions.Add(measure.Width);
                 measure.Width++;
                 measureStart = false;
             }
@@ -148,8 +155,11 @@ namespace NoteDetection
 
             if (Global.Handy == Hand.Left)
                 leftHand++;
-            if (Global.Handy == Hand.Right)
+            else if (Global.Handy == Hand.Right)
                 rightHand++;
+
+            if (leftHand > 1) leftHand = 1;
+            if (rightHand > 1) rightHand = 1;
             
             if(!startTracking)
             {
@@ -175,11 +185,15 @@ namespace NoteDetection
         {
             if (Global.Handy == Hand.Left)
                 leftHand--;
-            if (Global.Handy == Hand.Right)
+            else if (Global.Handy == Hand.Right)
                 rightHand--;
+
+            if (leftHand < 0) leftHand = 0;
+            if (rightHand < 0) rightHand = 0;
 
             // Setting the Positions
             blackPressed = keys.BlackKeyPress(e.NoteID, out chrom);
+            whitePressed = keys.WhiteKeyPress(e.NoteID, out chrom);
 
             Chromatic oldValue = chromatic;
             int shiftX = keys.ChangePosition(oldY, newY, numberPlayed, chrom, oldValue, out chromatic);

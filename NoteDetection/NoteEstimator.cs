@@ -15,14 +15,9 @@ namespace NoteDetection
         /// </summary>
         private static long[] thresholds;
 
-        private int count = 0;
+        public long SixteenthCount => thresholds[0];
 
-        public long SixteenthCount {
-            get
-            {
-                return thresholds[0];
-            }
-        }
+        public long QuarterCount => thresholds[4];
 
         /// <summary>
         ///  Stores the thresholds based on the BPM retrieved from Start Form
@@ -43,6 +38,22 @@ namespace NoteDetection
             thresholds[(int)Timing.ThirdHalf] = (long)((minute / bpm) * 3.5);
             thresholds[(int)Timing.Whole] = (long)((minute / bpm) * 4.5);
 
+        }
+
+        public string GetRestSymbol(long duration)
+        {
+            if (duration < thresholds[0] || duration < thresholds[1])
+            {
+                return "\uD834\uDD3F";
+            }
+            else if (duration < thresholds[2] || duration < thresholds[3])
+            {
+                return "\uD834\uDD3E";
+            }
+            else
+            {
+                return "\uD834\uDD3D";
+            }
         }
 
         /// <summary>

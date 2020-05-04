@@ -72,7 +72,10 @@ namespace NoteDetection
         Graphics g;
 
         // variables for measure drawing
-        public List<int> measurePositions = new List<int>();
+        public List<int> MeasurePositions = new List<int>();
+
+        // List of rests, left and right
+        public List<Symbol> Rests = new List<Symbol>();
 
         // The hand offset for the special symbols: dot, sharp, flat
         int handOffsetX;
@@ -194,13 +197,18 @@ namespace NoteDetection
             DrawLines(g);
 
 
-            for (int i = 0; i < measurePositions.Count; i++)
+            for (int i = 0; i < MeasurePositions.Count; i++)
             {
                 Brush noteBrush = Brushes.Black;
                 Pen measurePen = new Pen(noteBrush);
                 measurePen.Width = 3;
                 // x1 and x2 will be the same, will be the position passed in
-                g.DrawLine(measurePen, measurePositions[i], 495, measurePositions[i], 60);
+                g.DrawLine(measurePen, MeasurePositions[i], 495, MeasurePositions[i], 60);
+            }
+
+            for(int i = 0; i < Rests.Count; i++)
+            {
+                Rests[i].DrawSymbol(g, font, ff);
             }
 
             for (int i = 0; i < DrawingRightNotes.Count; i++)
