@@ -23,6 +23,14 @@ namespace NoteDetection
         Stopwatch[] oldTimers = new Stopwatch[127]; 
         Stopwatch[] currentTimers = new Stopwatch[127];
 
+        Stopwatch measureTime = new Stopwatch();
+        Stopwatch rightRest = new Stopwatch();
+        Stopwatch leftRest = new Stopwatch();
+        int leftHand;
+        int rightHand;
+        bool startTracking = false;
+        bool measureStart = false;
+
         DateTime startTime;
         System.Timers.Timer metronome;
 
@@ -30,6 +38,7 @@ namespace NoteDetection
         NoteEstimator noteEstimator;
         Drawn drawn = new Drawn();
         Keys keys = new Keys();
+        Measure measure = new Measure();
         SheetMusic sheetForm;
 
         // private variables passed between Forms
@@ -69,9 +78,38 @@ namespace NoteDetection
             metronome.Elapsed += OnTick;
         }
 
+        // Sixteeneth Rest -> "\uD834\uDD3F"
+        // Eighteth Rest ->  "\uD834\uDD3E"
+        // Quarter Rest -> "\uD834\uDD3D"
         private void OnTick(object args, System.Timers.ElapsedEventArgs e)
         {
-            
+            if(leftHand == 0)
+            {
+                leftRest.Start();
+            }
+            if (leftHand != 0)
+            {
+                leftRest.Stop();
+                // draw the symbol for the rest add to restList to be drawn in SheetMusic
+                leftRest.Reset();
+            }
+            if (rightHand == 0)
+            {
+                rightRest.Start();
+            }
+            if(rightHand != 0)
+            {
+                rightRest.Stop();
+                // draw the symbol for the rest add to restList to be drawn in SheetMusic
+                rightRest.Reset();
+            }
+            if(measureTime.ElapsedMilliseconds >= (noteEstimator.SixteenthCount * 16))
+            {
+                measureTime.Reset();
+                sheetForm.measurePositions.Add(measure.Width);
+                measure.Width++;
+                measureStart = false;
+            }
         }
             
         // Loads the Device for the Piano Control
@@ -107,9 +145,26 @@ namespace NoteDetection
             oldTimers[e.NoteID].Start();
             
             startTime = DateTime.UtcNow;
-            metronome.Start(); // HERE??
 
-            //System.Diagnostics.Debug.WriteLine($"{e.NoteID} noteID");
+            if (Global.Handy == Hand.Left)
+                leftHand++;
+            if (Global.Handy == Hand.Right)
+                rightHand++;
+            
+            if(!startTracking)
+            {
+                metronome.Start();
+                startTracking = true;
+            }
+
+            if(!measureStart)
+            {
+                measureTime.Start();
+                measureStart = true;
+            }
+
+            System.Diagnostics.Debug.WriteLine($"{measureTime.ElapsedMilliseconds } measure count");
+
             outDevice.Send(new ChannelMessage(ChannelCommand.NoteOn, 0, e.NoteID, 127));
 
             offset += 45;
@@ -118,9 +173,12 @@ namespace NoteDetection
         // For when the Keyboard Note or Mouse Note is released
         private void PianoControl_PianoKeyUp(object sender, PianoKeyEventArgs e)
         {
-            // Setting the Positions
+            if (Global.Handy == Hand.Left)
+                leftHand--;
+            if (Global.Handy == Hand.Right)
+                rightHand--;
 
-            whitePressed = keys.WhiteKeyPress(e.NoteID, out chrom);
+            // Setting the Positions
             blackPressed = keys.BlackKeyPress(e.NoteID, out chrom);
 
             Chromatic oldValue = chromatic;

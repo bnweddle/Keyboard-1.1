@@ -15,6 +15,8 @@ namespace NoteDetection
         /// </summary>
         private static long[] thresholds;
 
+        private int count = 0;
+
         public long SixteenthCount {
             get
             {
@@ -85,6 +87,44 @@ namespace NoteDetection
             }
             else
                 return Timing.Whole;
+        }
+
+
+        private long EstimateCount(Timing time)
+        {
+            long count = 0;
+            switch (time)
+            {
+                case Timing.Sixteenth:
+                    count = 250;
+                    break;
+                case Timing.ThirdSixteen:
+                    count = 375;
+                    break;
+                case Timing.Eighth:
+                    count = 500;
+                    break;
+                case Timing.ThirdEigth:
+                    count = 750;
+                    break;
+                case Timing.Quarter:
+                    count = 1000;
+                    break;
+                case Timing.ThirdQuart:
+                    count = 1500;
+                    break;
+                case Timing.Half:
+                    count = 2000;
+                    break;
+                case Timing.ThirdHalf:
+                    count = 3000;
+                    break;
+                case Timing.Whole:
+                    count = 4000;
+                    break;
+            }
+
+            return count;
         }
 
     }

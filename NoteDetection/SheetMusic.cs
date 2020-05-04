@@ -2,19 +2,20 @@
  * Class: SheetMusic.cs 
  * 
  TO DO: 
- * 1. Change how Keyboard Keys work (LIMITATION)      - Ask Professor
- * 2. Think about Rests (time between pressed notes)  - Get Idea from Professor 
- * 3. Implement Measures checking with Time Signature - 2 & 3 would go hand-in-hand 
- * 4. Fix Scrolling Off the Form Issue                - Show Professor
- *    (Slightly better)
- * 5. Two Notes right beside each other are pressed  
- * 6. If multiple eight or sixteenth notes are pressed only draw one curly end
- * 7. Have offset problem 
+ * 1. Think about Rests (time between pressed notes)  - Get Idea from Professor 
+ * 2. Implement Measures checking with Time Signature - 2 & 3 would go hand-in-hand 
+ * 3. Two Notes right beside each other are pressed  
+ * 4. If multiple eight or sixteenth notes are pressed only draw one curly end
  *    
- * Extra to Think About for future:
+ * Extra to Think About for Future:
  * 1. How to implement Beams when multiple Eighth/Sixteenth Notes are pressed
+ *    > Also create Minor and Major Scales implementation
  * 2. How to read and play back what was created
  * 3. How to print PDF
+ * 4. Create Modes (Listen, Play, Edit)
+ * 
+ * In the Far Far Future:
+ * Somehow create Microphone listening, so it records when you are actually playing the piano
  * */
 
 using System;
@@ -69,6 +70,9 @@ namespace NoteDetection
 
         // Paint graphics
         Graphics g;
+
+        // variables for measure drawing
+        public List<int> measurePositions = new List<int>();
 
         // The hand offset for the special symbols: dot, sharp, flat
         int handOffsetX;
@@ -188,6 +192,16 @@ namespace NoteDetection
             g.TranslateTransform(this.AutoScrollPosition.X, this.AutoScrollPosition.Y);
             g.SmoothingMode = SmoothingMode.HighQuality;
             DrawLines(g);
+
+
+            for (int i = 0; i < measurePositions.Count; i++)
+            {
+                Brush noteBrush = Brushes.Black;
+                Pen measurePen = new Pen(noteBrush);
+                measurePen.Width = 3;
+                // x1 and x2 will be the same, will be the position passed in
+                g.DrawLine(measurePen, measurePositions[i], 495, measurePositions[i], 60);
+            }
 
             for (int i = 0; i < DrawingRightNotes.Count; i++)
             {

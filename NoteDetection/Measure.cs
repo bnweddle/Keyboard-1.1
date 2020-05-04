@@ -14,7 +14,7 @@ namespace NoteDetection
         /// <summary>
         /// The Width of each Measure, 16 sixteenth notes = whole note!! That's crazy width
         /// </summary>
-        public int Width { get; set; } = 925;
+        public int Width { get; set; } = 900;
 
         /// <summary>
         /// How many Milliseconds (counts) are on a full measure

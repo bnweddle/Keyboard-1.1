@@ -63,46 +63,5 @@ namespace NoteDetection
             NoteTime = time;
         }
 
-        /// <summary>
-        /// The Spacing that a Time Note should take up in a measure
-        /// </summary>
-        /// <param name="symbol"></param>
-        /// <returns>Spacing per Timing</returns>
-        public double GetSpacing(Timing symbol)
-        {
-            double offset = 0;
-            switch (symbol)
-            {
-                case Timing.Sixteenth:
-                    offset = 45;
-                    break;
-                case Timing.ThirdSixteen:
-                    offset = 45 + 22.5;
-                    break;
-                case Timing.Eighth:
-                    offset = 90;
-                    break;
-                case Timing.ThirdEigth:
-                    offset = 120;
-                    break;
-                case Timing.Quarter:
-                    offset = 180;
-                    break;
-                case Timing.ThirdQuart:
-                    offset = 270;
-                    break;
-                case Timing.Half:
-                    offset = 360;
-                    break;
-                case Timing.ThirdHalf:
-                    offset = 540;
-                    break;
-                case Timing.Whole:
-                    offset = 720;
-                    break;
-            }
-
-            return offset;
-        }
     }
 }
