@@ -23,6 +23,7 @@ namespace NoteDetection
         Stopwatch[] oldTimers = new Stopwatch[127]; 
         Stopwatch[] currentTimers = new Stopwatch[127];
 
+        // Measures and Rests
         Stopwatch measureTime = new Stopwatch();
         Stopwatch rightRest = new Stopwatch();
         Stopwatch leftRest = new Stopwatch();
@@ -30,6 +31,10 @@ namespace NoteDetection
         int rightHand;
         bool startTracking = false;
         bool measureStart = false;
+        bool tickingLeft = false;
+        bool tickingRight = false;
+
+        int measureCount;
 
         DateTime startTime;
         System.Timers.Timer metronome;
@@ -80,43 +85,67 @@ namespace NoteDetection
 
         private void OnTick(object args, System.Timers.ElapsedEventArgs e)
         {
-            if(leftHand == 0)
+            measureCount++;
+
+            if(measureCount > 16 * 4)
             {
-                leftRest.Start();
-                if (leftRest.ElapsedMilliseconds.Round(100) >= noteEstimator.QuarterCount)
-                {
-                    leftHand = 1;
-                }
+                sheetForm.MeasurePositions.Add(measure.Width);
+                measure.Width++;
+                measureCount = 0;
             }
-            if (leftHand != 0)
-            {
-                leftRest.Stop();
-                string rest = noteEstimator.GetRestSymbol(rightRest.ElapsedMilliseconds.Round(100));
-                sheetForm.Rests.Add(new Symbol(rest, 60, offset, 300));
-                leftRest.Reset();
-            }
-            if (rightHand == 0)
+
+            if(rightHand == 0 && !tickingRight)
             {
                 rightRest.Start();
-                if(rightRest.ElapsedMilliseconds.Round(100) >= noteEstimator.QuarterCount)
-                {
-                    rightHand = 1;
-                }
-            }
-            if(rightHand != 0)
+
+                Console.WriteLine("Start right");
+                tickingRight = true;
+            }      
+            if (rightHand != 0 && tickingRight)
             {
+                tickingRight = false;
+                System.Diagnostics.Debug.WriteLine($"{rightRest.ElapsedMilliseconds.Round(100) } right rest ticking");
+
+                Console.WriteLine("rest right");
                 rightRest.Stop();
-                string rest = noteEstimator.GetRestSymbol(rightRest.ElapsedMilliseconds.Round(100));
-                sheetForm.Rests.Add(new Symbol(rest, 60, offset, 150));
+                System.Diagnostics.Debug.WriteLine($"{rightRest.ElapsedMilliseconds } right rest time");
+                string[] restsRight = noteEstimator.GetRestSymbol(rightRest.ElapsedMilliseconds.Round(100));
+                foreach (string s in restsRight)
+                {
+                    sheetForm.Rests.Add(new Symbol(s, 60, offset, 150));
+                    offset += 45; // fix later
+                }
                 rightRest.Reset();
             }
-            if(measureTime.ElapsedMilliseconds >= (noteEstimator.SixteenthCount * 16))
+
+            if (leftHand == 0 && !tickingLeft)
+            {
+                rightRest.Start();
+
+                Console.WriteLine("Start right");
+                tickingLeft = true;
+            }
+            if (leftHand != 0 && tickingLeft)
+            {
+                tickingLeft = false;
+
+                leftRest.Stop();
+                string[] restsLeft = noteEstimator.GetRestSymbol(rightRest.ElapsedMilliseconds.Round(100));
+                foreach (string s in restsLeft)
+                {
+                    sheetForm.Rests.Add(new Symbol(s, 60, offset, 300));
+                    offset += 45; // fix later
+                }
+                leftRest.Reset();
+            }
+
+           /* if(measureTime.ElapsedMilliseconds >= (noteEstimator.SixteenthCount * 16))
             {
                 measureTime.Reset();
                 sheetForm.MeasurePositions.Add(measure.Width);
                 measure.Width++;
                 measureStart = false;
-            }
+            } */
         }
             
         // Loads the Device for the Piano Control
@@ -153,29 +182,33 @@ namespace NoteDetection
             
             startTime = DateTime.UtcNow;
 
-            if (Global.Handy == Hand.Left)
-                leftHand++;
-            else if (Global.Handy == Hand.Right)
-                rightHand++;
+            System.Diagnostics.Debug.WriteLine($"{measureTime.ElapsedMilliseconds } measure count");
 
-            if (leftHand > 1) leftHand = 1;
-            if (rightHand > 1) rightHand = 1;
-            
-            if(!startTracking)
+            outDevice.Send(new ChannelMessage(ChannelCommand.NoteOn, 0, e.NoteID, 127));
+
+            if (Global.Handy == Hand.Left)
+            {
+                leftHand++;
+            }
+            if (Global.Handy == Hand.Right)
+            {
+                rightHand++;
+            }            
+
+            System.Diagnostics.Debug.WriteLine($"{leftHand } lefty");
+            System.Diagnostics.Debug.WriteLine($"{rightHand } righty");
+
+            if (!startTracking)
             {
                 metronome.Start();
                 startTracking = true;
             }
 
-            if(!measureStart)
+            if (!measureStart)
             {
                 measureTime.Start();
                 measureStart = true;
             }
-
-            System.Diagnostics.Debug.WriteLine($"{measureTime.ElapsedMilliseconds } measure count");
-
-            outDevice.Send(new ChannelMessage(ChannelCommand.NoteOn, 0, e.NoteID, 127));
 
             offset += 45;
         }
@@ -184,9 +217,13 @@ namespace NoteDetection
         private void PianoControl_PianoKeyUp(object sender, PianoKeyEventArgs e)
         {
             if (Global.Handy == Hand.Left)
+            {
                 leftHand--;
+            }
             else if (Global.Handy == Hand.Right)
+            {
                 rightHand--;
+            }
 
             if (leftHand < 0) leftHand = 0;
             if (rightHand < 0) rightHand = 0;
@@ -218,13 +255,8 @@ namespace NoteDetection
                 thirds = false;
 
             System.Diagnostics.Debug.WriteLine($"{symbols } timing");
-
-
-
             System.Diagnostics.Debug.WriteLine($"{oldY } old Y Position");
             System.Diagnostics.Debug.WriteLine($"{newY } new Y Position");     
-
-            
 
             newY = oldY;
 

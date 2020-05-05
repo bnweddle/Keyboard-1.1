@@ -3,6 +3,8 @@
  * Got Help from Advisor Nathan Bean in implementing
 */
 
+using System.Collections.Generic;
+
 namespace NoteDetection
 {
     /// <summary>
@@ -40,20 +42,41 @@ namespace NoteDetection
 
         }
 
-        public string GetRestSymbol(long duration)
+        public string[] GetRestSymbol(long duration)
         {
-            if (duration < thresholds[0] || duration < thresholds[1])
+            List<string> rests = new List<string>();
+            System.Diagnostics.Debug.WriteLine($"{duration} duration");
+
+            while (duration >= thresholds[4])
             {
-                return "\uD834\uDD3F";
+                rests.Add("\uD834\uDD3D");
+                duration -= thresholds[4];
+                System.Diagnostics.Debug.WriteLine("quarter rest");
             }
-            else if (duration < thresholds[2] || duration < thresholds[3])
+            while (duration >= thresholds[2])
             {
-                return "\uD834\uDD3E";
+                rests.Add("\uD834\uDD3E"); // look at later
+                duration -= thresholds[2];
+                System.Diagnostics.Debug.WriteLine("eigth rest");
             }
-            else
+            while (duration >= thresholds[0])
             {
-                return "\uD834\uDD3D";
+                rests.Add("\uD834\uDD3E"); 
+                duration -= thresholds[0];
+                System.Diagnostics.Debug.WriteLine("sixteen rest");
             }
+
+            return rests.ToArray();
+        }
+
+        public int MultipleRests(long duration)
+        {
+            int iterations = 0;
+            duration = duration.Round(100);
+
+            iterations = (int)(duration % thresholds[4]);
+
+            return iterations;
         }
 
         /// <summary>
