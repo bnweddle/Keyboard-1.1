@@ -87,6 +87,7 @@ namespace NoteDetection
         {
             
             measureCount++;
+            // The offset is getting way off
 
             if (rightHand == 0)
             {
@@ -127,8 +128,8 @@ namespace NoteDetection
 
                     if (leftRest.Ticks >= (int)noteEstimator.QuartCount)
                     {
-                        sheetForm.Rests.Add(new Symbol("\uD834\uDD3D", 60, offset, 300));
                         offset += 45;
+                        sheetForm.Rests.Add(new Symbol("\uD834\uDD3D", 60, offset, 300));
                         leftRest = leftRest.Subtract(new TimeSpan(noteEstimator.QuartCount));
                     }
                 }
@@ -137,6 +138,7 @@ namespace NoteDetection
             {
                 tickingLeft = false;
             }
+
 
             if (measureCount > 16)
             {
