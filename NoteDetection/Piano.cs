@@ -103,6 +103,8 @@ namespace NoteDetection
                     if (rightRest.Ticks >= (int)noteEstimator.QuartCount)
                     {
                         offset += 45;
+                        sheetForm.ScrollWidth += 45;
+                        sheetForm.StaffWidth += 45;
                         sheetForm.Rests.Add(new Symbol("\uD834\uDD3D", 60, offset, 150));
                         rightRest = rightRest.Subtract(new TimeSpan(noteEstimator.QuartCount));
                     }
@@ -129,6 +131,8 @@ namespace NoteDetection
                     if (leftRest.Ticks >= (int)noteEstimator.QuartCount)
                     {
                         offset += 45;
+                        sheetForm.ScrollWidth += 45;
+                        sheetForm.StaffWidth += 45;
                         sheetForm.Rests.Add(new Symbol("\uD834\uDD3D", 60, offset, 300));
                         leftRest = leftRest.Subtract(new TimeSpan(noteEstimator.QuartCount));
                     }

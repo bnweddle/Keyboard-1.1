@@ -39,11 +39,10 @@ namespace NoteDetection
 
         // private variables for scrolling and drawing sheet music lines
         private int staffHeight = 15;
-        private int staffWidth = 900;
-        private int scrollWidth = 900;
+        private int scrollMusic = 0;
 
-
-        public int scroll;
+        public int StaffWidth { get; set; } = 900;
+        public int ScrollWidth { get; set; } = 900;
 
         /// <summary>
         /// Constructor
@@ -83,6 +82,7 @@ namespace NoteDetection
         int handOffsetX;
         int handOffsetY;
 
+
         // The chromatic value of the Notes
         Chromatic chromValue = Chromatic.Natural;
 
@@ -91,7 +91,7 @@ namespace NoteDetection
         /// </summary>
         protected override void OnPaint(PaintEventArgs e)
         {
-
+         
             base.OnPaint(e);
         }
 
@@ -104,13 +104,14 @@ namespace NoteDetection
         public void UpdatePaint(int off, bool third, double position)
         {
             // Handle the auto scrolling while playing
-            scrollWidth += 40;
-            staffWidth += 40;
-            scroll = off - this.Size.Width + 100; // WHY is it not scrolling correctly!!
-            System.Diagnostics.Debug.WriteLine($"{scroll } scrollling");
+            ScrollWidth += 45;
+            StaffWidth += 45;
+            scrollMusic = off - 500; // WHY is it not scrolling correctly!!
+            System.Diagnostics.Debug.WriteLine($"{ScrollWidth } scrollling");
 
-            this.AutoScrollMinSize = new Size(scrollWidth, this.Size.Height - 100);
-            this.AutoScrollPosition = new Point(scroll, 0);
+            this.AutoScrollMinSize = new Size(ScrollWidth, this.Size.Height - 100);
+            this.AutoScrollPosition = new Point(scrollMusic, 0);
+
             Symbol symbol;
 
             if (Global.Handy == Hand.Right)
@@ -269,20 +270,20 @@ namespace NoteDetection
             int i;
             // draw some staff lines, 900 will need to change as user is playing, want to scroll with sheet music as user plays as well
             for (i = 0; i < 4; i++)
-                g.DrawLine(Pens.White, 0, i * staffHeight, staffWidth, i * staffHeight); // White space for extra room
+                g.DrawLine(Pens.White, 0, i * staffHeight, StaffWidth, i * staffHeight); // White space for extra room
             for (; i < 13; i++)
-                g.DrawLine(Pens.Wheat, 0, i * staffHeight, staffWidth, i * staffHeight); // High notes
+                g.DrawLine(Pens.Wheat, 0, i * staffHeight, StaffWidth, i * staffHeight); // High notes
             for (; i < 18; i++)
-                g.DrawLine(Pens.Black, 0, i * staffHeight, staffWidth, i * staffHeight); // Middle treble clef range
+                g.DrawLine(Pens.Black, 0, i * staffHeight, StaffWidth, i * staffHeight); // Middle treble clef range
             i = 18;
-            g.DrawLine(Pens.Wheat, 0, i * staffHeight, staffWidth, i * staffHeight); // Middle C
+            g.DrawLine(Pens.Wheat, 0, i * staffHeight, StaffWidth, i * staffHeight); // Middle C
             i++;
             for (; i < 23; i++)
-                g.DrawLine(Pens.White, 0, i * staffHeight, staffWidth, i * staffHeight); // Middle notes
+                g.DrawLine(Pens.White, 0, i * staffHeight, StaffWidth, i * staffHeight); // Middle notes
             for (; i < 28; i++)
-                g.DrawLine(Pens.Black, 0, i * staffHeight, staffWidth, i * staffHeight); // Middle bass clef range
+                g.DrawLine(Pens.Black, 0, i * staffHeight, StaffWidth, i * staffHeight); // Middle bass clef range
             for (; i < 34; i++)
-                g.DrawLine(Pens.Wheat, 0, i * staffHeight, staffWidth, i * staffHeight); // Low notes
+                g.DrawLine(Pens.Wheat, 0, i * staffHeight, StaffWidth, i * staffHeight); // Low notes
         }
     }
 }
