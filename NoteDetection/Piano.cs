@@ -3,6 +3,7 @@
  * Used PianoControl from MidiKit on Github with Free Software License
  * */
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Windows.Forms;
 using Sanford.Multimedia.Midi;
@@ -23,18 +24,18 @@ namespace NoteDetection
         Stopwatch[] oldTimers = new Stopwatch[127]; 
         Stopwatch[] currentTimers = new Stopwatch[127];
 
+        // TimeSpans for rests
+        TimeSpan rightRest = new TimeSpan();
+        TimeSpan leftRest = new TimeSpan();
+        
         // Measures and Rests
-        Stopwatch measureTime = new Stopwatch();
-        Stopwatch rightRest = new Stopwatch();
-        Stopwatch leftRest = new Stopwatch();
-        int leftHand;
-        int rightHand;
-        bool startTracking = false;
-        bool measureStart = false;
+        int leftHand, rightHand;
+        int offset = 75;
+        bool startPlaying = false;
         bool tickingLeft = false;
         bool tickingRight = false;
-
         int measureCount;
+
 
         DateTime startTime;
         System.Timers.Timer metronome;
@@ -47,7 +48,6 @@ namespace NoteDetection
         SheetMusic sheetForm;
 
         // private variables passed between Forms
-        private int offset = 75;
         private bool thirds = false;
         private bool chrom = false;
         private Chromatic chromatic = Chromatic.Natural;
@@ -85,67 +85,65 @@ namespace NoteDetection
 
         private void OnTick(object args, System.Timers.ElapsedEventArgs e)
         {
+            
             measureCount++;
 
-            if(measureCount > 16 * 4)
+            if (rightHand == 0)
             {
-                sheetForm.MeasurePositions.Add(measure.Width);
-                measure.Width++;
-                measureCount = 0;
-            }
+                if (!tickingRight)
+                {
+                    tickingRight = true;
+                }
+                else
+                {
+                    // Only displays quarter rests
+                    rightRest = rightRest.Add(new TimeSpan(noteEstimator.SixteenthCount));
+                    System.Diagnostics.Debug.WriteLine($"{rightRest.Ticks} right rest before");
+                    if (rightRest.Ticks >= (int)noteEstimator.QuartCount)
+                    {
+                        offset += 45;
+                        sheetForm.Rests.Add(new Symbol("\uD834\uDD3D", 60, offset, 150));
+                        rightRest = rightRest.Subtract(new TimeSpan(noteEstimator.QuartCount));
+                    }
 
-            if(rightHand == 0 && !tickingRight)
-            {
-                rightRest.Start();
+                    System.Diagnostics.Debug.WriteLine($"{rightRest.Ticks} right rest after");                 
+                }            
 
-                Console.WriteLine("Start right");
-                tickingRight = true;
             }      
-            if (rightHand != 0 && tickingRight)
+            if(rightHand != 0 && tickingRight)
             {
                 tickingRight = false;
-                System.Diagnostics.Debug.WriteLine($"{rightRest.ElapsedMilliseconds.Round(100) } right rest ticking");
-
-                Console.WriteLine("rest right");
-                rightRest.Stop();
-                System.Diagnostics.Debug.WriteLine($"{rightRest.ElapsedMilliseconds } right rest time");
-                string[] restsRight = noteEstimator.GetRestSymbol(rightRest.ElapsedMilliseconds.Round(100));
-                foreach (string s in restsRight)
-                {
-                    sheetForm.Rests.Add(new Symbol(s, 60, offset, 150));
-                    offset += 45; // fix later
-                }
-                rightRest.Reset();
             }
 
-            if (leftHand == 0 && !tickingLeft)
+            if (leftHand == 0)
             {
-                rightRest.Start();
+                if (!tickingLeft)
+                {
+                    tickingLeft = true;
+                }
+                else
+                {
+                    leftRest = leftRest.Add(new TimeSpan(noteEstimator.SixteenthCount));
 
-                Console.WriteLine("Start right");
-                tickingLeft = true;
+                    if (leftRest.Ticks >= (int)noteEstimator.QuartCount)
+                    {
+                        sheetForm.Rests.Add(new Symbol("\uD834\uDD3D", 60, offset, 300));
+                        offset += 45;
+                        leftRest = leftRest.Subtract(new TimeSpan(noteEstimator.QuartCount));
+                    }
+                }
             }
             if (leftHand != 0 && tickingLeft)
             {
                 tickingLeft = false;
-
-                leftRest.Stop();
-                string[] restsLeft = noteEstimator.GetRestSymbol(rightRest.ElapsedMilliseconds.Round(100));
-                foreach (string s in restsLeft)
-                {
-                    sheetForm.Rests.Add(new Symbol(s, 60, offset, 300));
-                    offset += 45; // fix later
-                }
-                leftRest.Reset();
             }
 
-           /* if(measureTime.ElapsedMilliseconds >= (noteEstimator.SixteenthCount * 16))
+            if (measureCount > 16)
             {
-                measureTime.Reset();
                 sheetForm.MeasurePositions.Add(measure.Width);
-                measure.Width++;
-                measureStart = false;
-            } */
+                measure.Width += 900;
+                measureCount = 0;
+            }
         }
             
         // Loads the Device for the Piano Control
@@ -182,15 +180,13 @@ namespace NoteDetection
             
             startTime = DateTime.UtcNow;
 
-            System.Diagnostics.Debug.WriteLine($"{measureTime.ElapsedMilliseconds } measure count");
-
             outDevice.Send(new ChannelMessage(ChannelCommand.NoteOn, 0, e.NoteID, 127));
 
             if (Global.Handy == Hand.Left)
             {
                 leftHand++;
             }
-            if (Global.Handy == Hand.Right)
+            else if (Global.Handy == Hand.Right)
             {
                 rightHand++;
             }            
@@ -198,16 +194,10 @@ namespace NoteDetection
             System.Diagnostics.Debug.WriteLine($"{leftHand } lefty");
             System.Diagnostics.Debug.WriteLine($"{rightHand } righty");
 
-            if (!startTracking)
+            if (!startPlaying)
             {
                 metronome.Start();
-                startTracking = true;
-            }
-
-            if (!measureStart)
-            {
-                measureTime.Start();
-                measureStart = true;
+                startPlaying = true;
             }
 
             offset += 45;
@@ -232,8 +222,8 @@ namespace NoteDetection
             blackPressed = keys.BlackKeyPress(e.NoteID, out chrom);
             whitePressed = keys.WhiteKeyPress(e.NoteID, out chrom);
 
-            Chromatic oldValue = chromatic;
-            int shiftX = keys.ChangePosition(oldY, newY, numberPlayed, chrom, oldValue, out chromatic);
+            //Chromatic oldValue = chromatic;
+            //int shiftX = keys.ChangePosition(oldY, newY, numberPlayed, chrom, oldValue, out chromatic);
 
             keys.SetPositions(blackPressed, whitePressed, chromatic, chrom);
             
@@ -267,7 +257,8 @@ namespace NoteDetection
             Global.Image = drawn.GetImage(symbols, out time);
             Global.Time = time;
 
-            sheetForm.UpdatePaint(offset + shiftX, thirds, oldY);
+            int shiftX = 0;  // Get rid later!!!
+            sheetForm.UpdatePaint(offset, thirds, oldY);
 
             oldTimers[e.NoteID].Reset();
         }

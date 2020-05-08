@@ -41,7 +41,9 @@ namespace NoteDetection
         private int staffHeight = 15;
         private int staffWidth = 900;
         private int scrollWidth = 900;
-        private int scroll = 0;
+
+
+        public int scroll;
 
         /// <summary>
         /// Constructor
@@ -89,6 +91,7 @@ namespace NoteDetection
         /// </summary>
         protected override void OnPaint(PaintEventArgs e)
         {
+
             base.OnPaint(e);
         }
 
@@ -103,7 +106,8 @@ namespace NoteDetection
             // Handle the auto scrolling while playing
             scrollWidth += 40;
             staffWidth += 40;
-            scroll = off - this.Size.Width + 100;
+            scroll = off - this.Size.Width + 100; // WHY is it not scrolling correctly!!
+            System.Diagnostics.Debug.WriteLine($"{scroll } scrollling");
 
             this.AutoScrollMinSize = new Size(scrollWidth, this.Size.Height - 100);
             this.AutoScrollPosition = new Point(scroll, 0);

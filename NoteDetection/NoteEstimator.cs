@@ -19,7 +19,7 @@ namespace NoteDetection
 
         public long SixteenthCount => thresholds[0];
 
-        public long QuarterCount => thresholds[4];
+        public long QuartCount => thresholds[4];
 
         /// <summary>
         ///  Stores the thresholds based on the BPM retrieved from Start Form
@@ -55,28 +55,18 @@ namespace NoteDetection
             }
             while (duration >= thresholds[2])
             {
-                rests.Add("\uD834\uDD3E"); // look at later
+                rests.Add("\uD834\uDD3E"); 
                 duration -= thresholds[2];
                 System.Diagnostics.Debug.WriteLine("eigth rest");
             }
             while (duration >= thresholds[0])
             {
-                rests.Add("\uD834\uDD3E"); 
+                rests.Add("\uD834\uDD3F"); 
                 duration -= thresholds[0];
                 System.Diagnostics.Debug.WriteLine("sixteen rest");
             }
 
             return rests.ToArray();
-        }
-
-        public int MultipleRests(long duration)
-        {
-            int iterations = 0;
-            duration = duration.Round(100);
-
-            iterations = (int)(duration % thresholds[4]);
-
-            return iterations;
         }
 
         /// <summary>
