@@ -34,6 +34,9 @@
             this.uxSharp = new System.Windows.Forms.RadioButton();
             this.uxFlats = new System.Windows.Forms.RadioButton();
             this.label2 = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
+            this.Off = new System.Windows.Forms.CheckBox();
+            this.On = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.BPM)).BeginInit();
             this.SuspendLayout();
             // 
@@ -48,7 +51,7 @@
             // 
             // uxOpen
             // 
-            this.uxOpen.Location = new System.Drawing.Point(82, 143);
+            this.uxOpen.Location = new System.Drawing.Point(155, 156);
             this.uxOpen.Name = "uxOpen";
             this.uxOpen.Size = new System.Drawing.Size(104, 31);
             this.uxOpen.TabIndex = 2;
@@ -110,11 +113,45 @@
             this.label2.TabIndex = 6;
             this.label2.Text = "Set Type";
             // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(297, 37);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(94, 17);
+            this.label3.TabIndex = 7;
+            this.label3.Text = "Display Rests";
+            // 
+            // Off
+            // 
+            this.Off.Appearance = System.Windows.Forms.Appearance.Button;
+            this.Off.AutoSize = true;
+            this.Off.Location = new System.Drawing.Point(300, 67);
+            this.Off.Name = "Off";
+            this.Off.Size = new System.Drawing.Size(37, 27);
+            this.Off.TabIndex = 8;
+            this.Off.Text = "Off";
+            this.Off.UseVisualStyleBackColor = true;
+            // 
+            // On
+            // 
+            this.On.Appearance = System.Windows.Forms.Appearance.Button;
+            this.On.AutoSize = true;
+            this.On.Location = new System.Drawing.Point(300, 95);
+            this.On.Name = "On";
+            this.On.Size = new System.Drawing.Size(37, 27);
+            this.On.TabIndex = 9;
+            this.On.Text = "On";
+            this.On.UseVisualStyleBackColor = true;
+            // 
             // Start
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(306, 186);
+            this.ClientSize = new System.Drawing.Size(415, 226);
+            this.Controls.Add(this.On);
+            this.Controls.Add(this.Off);
+            this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.uxFlats);
             this.Controls.Add(this.uxSharp);
@@ -137,5 +174,8 @@
         private System.Windows.Forms.RadioButton uxSharp;
         private System.Windows.Forms.RadioButton uxFlats;
         private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.CheckBox Off;
+        private System.Windows.Forms.CheckBox On;
     }
 }

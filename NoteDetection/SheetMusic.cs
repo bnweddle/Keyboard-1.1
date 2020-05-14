@@ -2,10 +2,8 @@
  * Class: SheetMusic.cs 
  * 
  TO DO: 
- * 1. Think about Rests (time between pressed notes)  - Get Idea from Professor 
- * 2. Implement Measures checking with Time Signature - 2 & 3 would go hand-in-hand 
- * 3. Two Notes right beside each other are pressed  
- * 4. If multiple eight or sixteenth notes are pressed only draw one curly end
+ * 1. Two Notes right beside each other are pressed  
+ * 2. If multiple eight or sixteenth notes are pressed only draw one curly end
  *    
  * Extra to Think About for Future:
  * 1. How to implement Beams when multiple Eighth/Sixteenth Notes are pressed
@@ -15,7 +13,7 @@
  * 4. Create Modes (Listen, Play, Edit)
  * 
  * In the Far Far Future:
- * Somehow create Microphone listening, so it records when you are actually playing the piano
+ * Somehow create Microphone listening, so it record as when you are actually playing the piano
  * */
 
 using System;

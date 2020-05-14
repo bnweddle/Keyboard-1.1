@@ -2,6 +2,7 @@
  * Class: Piano.cs
  * Used PianoControl from MidiKit on Github with Free Software License
  * */
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -56,17 +57,20 @@ namespace NoteDetection
         int whitePressed;
         int blackPressed;
 
+        bool rests;
+
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="bpm">Beats Per Minute</param>
         /// <param name="type">Chromatic Type</param>
         /// <param name="form">Sheet Music</param>
-        public Piano(int bpm, Chromatic type, SheetMusic form)
+        public Piano(int bpm, Chromatic type, SheetMusic form, bool rest)
         {
             InitializeComponent();
             sheetForm = form;
-            chromatic = type; 
+            chromatic = type;
+            rests = rest;
             noteEstimator = new NoteEstimator(bpm);
             
             sheetForm.Show();
@@ -87,63 +91,63 @@ namespace NoteDetection
         {
             
             measureCount++;
-            // The offset is getting way off
 
-            if (rightHand == 0)
+            if(rests == true)
             {
-                if (!tickingRight)
+                if (rightHand == 0)
                 {
-                    tickingRight = true;
-                }
-                else
-                {
-                    // Only displays quarter rests
-                    rightRest = rightRest.Add(new TimeSpan(noteEstimator.SixteenthCount));
-                    System.Diagnostics.Debug.WriteLine($"{rightRest.Ticks} right rest before");
-                    if (rightRest.Ticks >= (int)noteEstimator.QuartCount)
+                    if (!tickingRight)
                     {
-                        offset += 45;
-                        sheetForm.ScrollWidth += 45;
-                        sheetForm.StaffWidth += 45;
-                        sheetForm.Rests.Add(new Symbol("\uD834\uDD3D", 60, offset, 150));
-                        rightRest = rightRest.Subtract(new TimeSpan(noteEstimator.QuartCount));
+                        tickingRight = true;
                     }
-
-                    System.Diagnostics.Debug.WriteLine($"{rightRest.Ticks} right rest after");                 
-                }            
-
-            }      
-            if(rightHand != 0 && tickingRight)
-            {
-                tickingRight = false;
-            }
-
-            if (leftHand == 0)
-            {
-                if (!tickingLeft)
-                {
-                    tickingLeft = true;
-                }
-                else
-                {
-                    leftRest = leftRest.Add(new TimeSpan(noteEstimator.SixteenthCount));
-
-                    if (leftRest.Ticks >= (int)noteEstimator.QuartCount)
+                    else
                     {
-                        offset += 45;
-                        sheetForm.ScrollWidth += 45;
-                        sheetForm.StaffWidth += 45;
-                        sheetForm.Rests.Add(new Symbol("\uD834\uDD3D", 60, offset, 300));
-                        leftRest = leftRest.Subtract(new TimeSpan(noteEstimator.QuartCount));
+                        // Only displays quarter rests
+                        rightRest = rightRest.Add(new TimeSpan(noteEstimator.SixteenthCount));
+                        if (rightRest.Ticks >= (int)noteEstimator.QuartCount)
+                        {
+                            offset += 45;
+                            sheetForm.ScrollWidth += 45;
+                            sheetForm.StaffWidth += 45;
+                            sheetForm.Rests.Add(new Symbol("\uD834\uDD3D", 60, offset, 150));
+                            rightRest = rightRest.Subtract(new TimeSpan(noteEstimator.QuartCount));
+                        }
+                 
+                    }            
+
+                }      
+                if(rightHand != 0 && tickingRight)
+                {
+                    tickingRight = false;
+                }
+
+                if (leftHand == 0)
+                {
+                    if (!tickingLeft)
+                    {
+                        tickingLeft = true;
+                    }
+                    else
+                    {
+                        // Only displays quarter rests
+                        leftRest = leftRest.Add(new TimeSpan(noteEstimator.SixteenthCount));
+
+                        if (leftRest.Ticks >= (int)noteEstimator.QuartCount)
+                        {
+                            offset += 45;
+                            sheetForm.ScrollWidth += 45;
+                            sheetForm.StaffWidth += 45;
+                            sheetForm.Rests.Add(new Symbol("\uD834\uDD3D", 60, offset, 300));
+                            leftRest = leftRest.Subtract(new TimeSpan(noteEstimator.QuartCount));
+                        }
                     }
                 }
-            }
-            if (leftHand != 0 && tickingLeft)
-            {
-                tickingLeft = false;
-            }
+                if (leftHand != 0 && tickingLeft)
+                {
+                    tickingLeft = false;
+                }
 
-
+            }
             if (measureCount > 16)
             {
                 sheetForm.MeasurePositions.Add(measure.Width);
@@ -228,8 +232,8 @@ namespace NoteDetection
             blackPressed = keys.BlackKeyPress(e.NoteID, out chrom);
             whitePressed = keys.WhiteKeyPress(e.NoteID, out chrom);
 
-            //Chromatic oldValue = chromatic;
-            //int shiftX = keys.ChangePosition(oldY, newY, numberPlayed, chrom, oldValue, out chromatic);
+            Chromatic oldValue = chromatic;
+            int shiftX = keys.ChangePosition(oldY, newY, numberPlayed, chrom, oldValue, out chromatic);
 
             keys.SetPositions(blackPressed, whitePressed, chromatic, chrom);
             
@@ -263,8 +267,7 @@ namespace NoteDetection
             Global.Image = drawn.GetImage(symbols, out time);
             Global.Time = time;
 
-            int shiftX = 0;  // Get rid later!!!
-            sheetForm.UpdatePaint(offset, thirds, oldY);
+            sheetForm.UpdatePaint(offset + shiftX, thirds, oldY);
 
             oldTimers[e.NoteID].Reset();
         }

@@ -24,23 +24,53 @@ namespace NoteDetection
         /// <param name="e"></param>
         private void uxOpen_Click(object sender, EventArgs e)
         {
-            
+            bool rests = true;
             Chromatic type = Chromatic.Natural;
 
-            if(uxSharp.Checked == true)
-                type = Chromatic.Sharp;
-            if (uxFlats.Checked)
-                type = Chromatic.Flat;
+            if(Off.Checked == false && On.Checked == false)
+            {
+                MessageBox.Show("Must Select to Show Rests or Not before continuing");
+            }
+            else if(Off.Checked == true && On.Checked == true)
+            {
+                MessageBox.Show("Must Select only On or Off, not both");
+            }
+            else if(Off.Checked == true || On.Checked == true)
+            {
+                if (uxSharp.Checked == true)
+                    type = Chromatic.Sharp;
+                if (uxFlats.Checked)
+                    type = Chromatic.Flat;
 
-            // Positions the Forms so they aren't on top of each other
-            SheetMusic sheet = new SheetMusic();
-            sheet.Location = new Point(500, 200);
-            Piano piano = new Piano(Convert.ToInt32(BPM.Text), type, sheet);
-            piano.Location = new Point(250, 0);
+                if (On.Checked == true)
+                {
+                    rests = true;
+                    Off.Checked = false;
+                    Off.CheckState = CheckState.Unchecked;
+                    Off.Update();
+                    this.Update();
+                }
+                if (Off.Checked == true)
+                {
+                    rests = false;
+                    On.Checked = false;
+                    On.CheckState = CheckState.Unchecked;
+                    On.Update();
+                    this.Update();
+                }
 
-            // Shows the Piano and hides the Main Form
-            piano.Show();
-            this.Hide();
+                // Positions the Forms so they aren't on top of each other
+                SheetMusic sheet = new SheetMusic();
+                sheet.Location = new Point(500, 200);
+                Piano piano = new Piano(Convert.ToInt32(BPM.Text), type, sheet, rests);
+                piano.Location = new Point(250, 0);
+
+                // Shows the Piano and hides the Main Form
+                piano.Show();
+                this.Hide();
+
+            }
+
             
         }
     }
